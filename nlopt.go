@@ -212,7 +212,7 @@ func Version() string {
 // <nil> or empty then it points to a slice of length n, which should (upon
 // return) be set in-place to the gradient of the function with respect to the
 // optimization parameters at x
-type Func func(x []float64, gradient []float64) float64
+type Func func(x, gradient []float64) float64
 
 // Mfunc is a vector-valued objective function for applications where it is
 // more convenient to define a single function that returns the values (and
@@ -222,7 +222,7 @@ type Func func(x []float64, gradient []float64) float64
 // non-<nil>, then gradient points to a slice of length m*n which should, upon
 // return, be set to the gradients of the constraint functions with respect to
 // x.
-type Mfunc func(result []float64, x []float64, gradient []float64)
+type Mfunc func(result, x, gradient []float64)
 
 // OBJECT-ORIENTED API
 
@@ -467,7 +467,7 @@ func (n *NLopt) AddInequalityMConstraint(fc Mfunc, tol []float64) error {
 			ptr := n.addMfunc(fc)
 			cTol := toCArray(tol)
 			m := len(tol)
-			return C.nlopt_add_inequality_mconstraint(n.cOpt, (C.uint)(m), (C.nlopt_func)(unsafe.Pointer(C.nlopt_func_go)), unsafe.Pointer(ptr), (*C.double)(&cTol[0]))
+			return C.nlopt_add_inequality_mconstraint(n.cOpt, (C.uint)(m), (C.nlopt_func)(unsafe.Pointer(C.nlopt_mfunc_go)), unsafe.Pointer(ptr), (*C.double)(&cTol[0]))
 		})
 }
 
@@ -499,7 +499,7 @@ func (n *NLopt) AddEqualityMConstraint(h Mfunc, tol []float64) error {
 			ptr := n.addMfunc(h)
 			cTol := toCArray(tol)
 			m := len(tol)
-			return C.nlopt_add_equality_mconstraint(n.cOpt, (C.uint)(m), (C.nlopt_func)(unsafe.Pointer(C.nlopt_func_go)), unsafe.Pointer(ptr), (*C.double)(&cTol[0]))
+			return C.nlopt_add_equality_mconstraint(n.cOpt, (C.uint)(m), (C.nlopt_func)(unsafe.Pointer(C.nlopt_mfunc_go)), unsafe.Pointer(ptr), (*C.double)(&cTol[0]))
 		})
 }
 

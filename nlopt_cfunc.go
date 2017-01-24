@@ -1,9 +1,7 @@
 package nlopt
 
 import "C"
-import (
-	"unsafe"
-)
+import "unsafe"
 
 //export nloptFunc
 func nloptFunc(n uint, x *C.double, gradient *C.double, fData unsafe.Pointer) C.double {

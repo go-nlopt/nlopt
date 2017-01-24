@@ -68,7 +68,7 @@ func main() {
         opt.SetLowerBounds([]float64{math.Inf(-1), 0.})
 
         var evals int
-        myfunc := func(x []float64, gradient []float64) float64 {
+        myfunc := func(x, gradient []float64) float64 {
                 evals++
                 if len(gradient) > 0 {
                         gradient[0] = 0.0
@@ -77,7 +77,7 @@ func main() {
                 return math.Sqrt(x[1])
         }
         
-        myconstraint := func(x []float64, gradient []float64, a, b float64) float64 {
+        myconstraint := func(x, gradient []float64, a, b float64) float64 {
                 if len(gradient) > 0 {
                         gradient[0] = 3*a* math.Pow(a*x[0]+b, 2.)
                         gradient[1] = -1.0
@@ -86,8 +86,8 @@ func main() {
         }
 
         opt.SetMinObjective(myfunc)
-        opt.AddInequalityConstraint(func(x []float64, gradient []float64) float64 { return myconstraint(x, gradient, 2., 0.)}, 1e-8)
-        opt.AddInequalityConstraint(func(x []float64, gradient []float64) float64 { return myconstraint(x, gradient, -1., 1.)}, 1e-8)
+        opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, 2., 0.)}, 1e-8)
+        opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, -1., 1.)}, 1e-8)
         opt.SetXtolRel(1e-4)
 
         x := []float64{1.234, 5.678}

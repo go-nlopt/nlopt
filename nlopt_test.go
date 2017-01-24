@@ -79,7 +79,7 @@ func TestNLopt_OptimizeMMA(t *testing.T) {
 	opt.SetLowerBounds([]float64{math.Inf(-1), 0.})
 
 	var count int
-	myfunc := func(x []float64, gradient []float64) float64 {
+	myfunc := func(x, gradient []float64) float64 {
 		count++
 		if len(gradient) > 0 {
 			gradient[0] = 0.0
@@ -88,7 +88,7 @@ func TestNLopt_OptimizeMMA(t *testing.T) {
 		return math.Sqrt(x[1])
 	}
 
-	myconstraint := func(x []float64, gradient []float64, a, b float64) float64 {
+	myconstraint := func(x, gradient []float64, a, b float64) float64 {
 		if len(gradient) > 0 {
 			gradient[0] = 3 * a * math.Pow(a*x[0]+b, 2.)
 			gradient[1] = -1.0
@@ -97,8 +97,8 @@ func TestNLopt_OptimizeMMA(t *testing.T) {
 	}
 
 	opt.SetMinObjective(myfunc)
-	opt.AddInequalityConstraint(func(x []float64, gradient []float64) float64 { return myconstraint(x, gradient, 2., 0.) }, 1e-8)
-	opt.AddInequalityConstraint(func(x []float64, gradient []float64) float64 { return myconstraint(x, gradient, -1., 1.) }, 1e-8)
+	opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, 2., 0.) }, 1e-8)
+	opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, -1., 1.) }, 1e-8)
 	opt.SetXtolRel(1e-4)
 
 	x := []float64{1.234, 5.678}
@@ -125,7 +125,7 @@ func TestNLopt_OptimizeCOBYLA(t *testing.T) {
 	opt.SetLowerBounds([]float64{math.Inf(-1), 0.})
 
 	var count int
-	myfunc := func(x []float64, gradient []float64) float64 {
+	myfunc := func(x, gradient []float64) float64 {
 		count++
 		if len(gradient) > 0 {
 			gradient[0] = 0.0
@@ -133,7 +133,7 @@ func TestNLopt_OptimizeCOBYLA(t *testing.T) {
 		}
 		return math.Sqrt(x[1])
 	}
-	myconstraint := func(x []float64, gradient []float64, a, b float64) float64 {
+	myconstraint := func(x, gradient []float64, a, b float64) float64 {
 		if len(gradient) > 0 {
 			gradient[0] = 3 * a * math.Pow(a*x[0]+b, 2.)
 			gradient[1] = -1.0
@@ -142,8 +142,8 @@ func TestNLopt_OptimizeCOBYLA(t *testing.T) {
 	}
 
 	opt.SetMinObjective(myfunc)
-	opt.AddInequalityConstraint(func(x []float64, gradient []float64) float64 { return myconstraint(x, gradient, 2., 0.) }, 1e-8)
-	opt.AddInequalityConstraint(func(x []float64, gradient []float64) float64 { return myconstraint(x, gradient, -1., 1.) }, 1e-8)
+	opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, 2., 0.) }, 1e-8)
+	opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, -1., 1.) }, 1e-8)
 	opt.SetXtolRel(0.)
 	opt.SetStopVal(math.Sqrt(8./27.) + 1e-3)
 
@@ -161,8 +161,64 @@ func TestNLopt_OptimizeCOBYLA(t *testing.T) {
 	fmt.Printf("COBYLA: found minimum at f(%g,%g) = %0.10g\n", xopt[0], xopt[1], minf)
 }
 
+func TestNLopt_OptimizeCOBYLA_MConstraint(t *testing.T) {
+	opt, err := NewNLopt(LN_COBYLA, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer opt.Destroy()
+
+	opt.SetLowerBounds([]float64{math.Inf(-1), 0.})
+
+	var count int
+	myfunc := func(x, gradient []float64) float64 {
+		count++
+		if len(gradient) > 0 {
+			gradient[0] = 0.0
+			gradient[1] = 0.5 / math.Sqrt(x[1])
+		}
+		return math.Sqrt(x[1])
+	}
+	myconstraintm := func(results, x, gradient, a, b []float64) {
+		n := len(x)
+		for i := 0; i < len(results); i++ {
+			va := a[i/2]
+			vb := b[i/2]
+			if len(gradient) > 0 {
+				gradient[i*n] = 3 * va * math.Pow(va*x[0]+vb, 2.)
+				gradient[i*n+1] = -1.0
+			}
+			results[i] = math.Pow(va*x[0]+vb, 3) - x[1]
+		}
+	}
+
+	opt.SetMinObjective(myfunc)
+	opt.AddInequalityMConstraint(func(result, x, gradient []float64) {
+		myconstraintm(result, x, gradient, []float64{2., 0.}, []float64{-1., 1.})
+	}, []float64{1e-8, 1e-8})
+	opt.SetXtolRel(0.)
+	opt.SetStopVal(math.Sqrt(8./27.) + 1e-3)
+	opt.SetLowerBounds([]float64{-10, 1e-6})
+	opt.SetUpperBounds1(10.)
+	opt.SetMaxEval(10000)
+	opt.SetInitialStep([]float64{1.0, 10.0})
+
+	x := []float64{1.234, 5.678}
+	xopt, minf, err := opt.Optimize(x)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := opt.LastStatus(), "STOPVAL_REACHED"; got != want {
+		t.Errorf("Expected last status='%s', got='%s'", want, got)
+	}
+	if got, want := count, 4; got != want {
+		t.Errorf("Expected evaluations count='%d', got='%d'", want, got)
+	}
+	fmt.Printf("COBYLA-M: found minimum at f(%g,%g) = %0.10g\n", xopt[0], xopt[1], minf)
+}
+
 func TestNLopt_SetMinObjective(t *testing.T) {
-	obj := func(x []float64, gradient []float64) float64 {
+	obj := func(x, gradient []float64) float64 {
 		return math.Inf(-1)
 	}
 	o, err := NewNLopt(GN_DIRECT_L_RAND, 1)
@@ -186,7 +242,7 @@ func TestNLopt_SetMinObjective(t *testing.T) {
 }
 
 func TestNLopt_SetMaxObjective(t *testing.T) {
-	obj := func(x []float64, gradient []float64) float64 {
+	obj := func(x, gradient []float64) float64 {
 		return math.Inf(-1)
 	}
 	o, err := NewNLopt(GN_DIRECT_L_RAND, 1)
@@ -404,7 +460,7 @@ func TestNLopt_AddEqualityConstraint(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer o.Destroy()
-	fc := func(x []float64, gradient []float64) float64 {
+	fc := func(x, gradient []float64) float64 {
 		return math.Inf(-1)
 	}
 	err = o.AddEqualityConstraint(fc, 0.)
@@ -423,7 +479,7 @@ func TestNLopt_AddEqualityMConstraint(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer o.Destroy()
-	fc := func(result []float64, x []float64, gradient []float64) {
+	fc := func(result, x, gradient []float64) {
 		return
 	}
 	err = o.AddEqualityMConstraint(fc, []float64{0.})
