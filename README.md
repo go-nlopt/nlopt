@@ -15,16 +15,16 @@ using cgo to a c-based implementation.
 
 ## Installation
 
-- On Fedora
+- On RedHat/CentOS/Fedora
 
 ~~~
-dnf -y install libnlopt-devel
+yum/dnf -y install nlopt-devel
 ~~~
 
-- On Ubuntu
+- On Ubuntu (14.04+)
 
 ~~~
-apt-get install libnlopt-dev
+apt-get install -y libnlopt-dev
 ~~~
 
 - or, install NLopt library on any Unix-like system (GNU/Linux is fine) with a 
