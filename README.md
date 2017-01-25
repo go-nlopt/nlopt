@@ -10,7 +10,7 @@ using cgo to a c-based implementation.
 
 *Beta*
 
-[![Build Status](https://travis-ci.org/go-nlopt/nlopt.svg?branch=master)](https://travis-ci.org/go-nlopt/nlopt) [![Coverage Status](https://coveralls.io/repos/github/go-nlopt/nlopt/badge.svg?branch=master)](https://coveralls.io/github/go-nlopt/nlopt?branch=master) [![GoDoc](https://godoc.org/gopkg.in/nlopt.v0?status.svg)](https://godoc.org/gopkg.in/nlopt.v0)
+[![Build Status](https://travis-ci.org/go-nlopt/nlopt.svg?branch=master)](https://travis-ci.org/go-nlopt/nlopt) [![Coverage Status](https://coveralls.io/repos/github/go-nlopt/nlopt/badge.svg?branch=master)](https://coveralls.io/github/go-nlopt/nlopt?branch=master) [![GoDoc](https://godoc.org/github.com/go-nlopt/nlopt?status.svg)](https://godoc.org/github.com/go-nlopt/nlopt)
 
 
 ## Installation
@@ -40,8 +40,8 @@ curl -O http://ab-initio.mit.edu/nlopt/nlopt-2.4.2.tar.gz && tar xzvf nlopt-2.4.
 Then install `nlopt` package
 
 ~~~
-go get gopkg.in/nlopt.v0
-[CGO_LDFLAGS="-L/path/to/NLopt -lnlopt"] go install gopkg.in/nlopt.v0
+go get -u github.com/go-nlopt/nlopt
+[CGO_LDFLAGS="-L/path/to/NLopt -lnlopt"] go install github.com/go-nlopt/nlopt
 ~~~
 
 
@@ -54,7 +54,7 @@ package main
 
 import (
         "fmt"
-        "gopkg.in/nlopt.v0"
+        "github.com/go-nlopt/nlopt"
         "math"
 )
 
