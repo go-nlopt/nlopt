@@ -69,6 +69,48 @@ func TestNLopt_Copy(t *testing.T) {
 	}
 }
 
+func TestNLopt_OptimizeNonlinearLeastSquares(t *testing.T) {
+	// test for Nonlinear Least Squares Without Jacobian
+	// https://uk.mathworks.com/help/optim/ug/nonlinear-least-squares-with-full-jacobian.html
+	opt, err := NewNLopt(LN_BOBYQA, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer opt.Destroy()
+
+	k := []float64{1., 2., 3., 4., 5., 6., 7., 8., 9., 10.}
+
+	var count int
+	myfun := func(x, gradient []float64) float64 {
+		count++
+		f := make([]float64, len(k))
+		for i := 0; i < len(k); i++ {
+			f[i] = 2 + 2*k[i] - math.Exp(k[i]*x[0]) - math.Exp(k[i]*x[1])
+		}
+		var chi2 float64
+		for i := 0; i < len(f); i++ {
+			chi2 += (f[i] * f[i])
+		}
+		return chi2
+	}
+
+	opt.SetMinObjective(myfun)
+	opt.SetXtolRel(1e-4)
+
+	x := []float64{0.3, 0.4}
+	xopt, minf, err := opt.Optimize(x)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := opt.LastStatus(), "XTOL_REACHED"; got != want {
+		t.Errorf("Expected last status='%s', got='%s'", want, got)
+	}
+	if got, want := count, 52; got != want {
+		t.Errorf("Expected evaluations count='%d', got='%d'", want, got)
+	}
+	fmt.Printf("BOBYQA: found minimum at f(%g,%g) = %0.10g\n", xopt[0], xopt[1], minf)
+}
+
 func TestNLopt_OptimizeMMA(t *testing.T) {
 	opt, err := NewNLopt(LD_MMA, 2)
 	if err != nil {
@@ -97,8 +139,12 @@ func TestNLopt_OptimizeMMA(t *testing.T) {
 	}
 
 	opt.SetMinObjective(myfunc)
-	opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, 2., 0.) }, 1e-8)
-	opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, -1., 1.) }, 1e-8)
+	opt.AddInequalityConstraint(func(x, gradient []float64) float64 {
+		return myconstraint(x, gradient, 2., 0.)
+	}, 1e-8)
+	opt.AddInequalityConstraint(func(x, gradient []float64) float64 {
+		return myconstraint(x, gradient, -1., 1.)
+	}, 1e-8)
 	opt.SetXtolRel(1e-4)
 
 	x := []float64{1.234, 5.678}
@@ -142,8 +188,12 @@ func TestNLopt_OptimizeCOBYLA(t *testing.T) {
 	}
 
 	opt.SetMinObjective(myfunc)
-	opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, 2., 0.) }, 1e-8)
-	opt.AddInequalityConstraint(func(x, gradient []float64) float64 { return myconstraint(x, gradient, -1., 1.) }, 1e-8)
+	opt.AddInequalityConstraint(func(x, gradient []float64) float64 {
+		return myconstraint(x, gradient, 2., 0.)
+	}, 1e-8)
+	opt.AddInequalityConstraint(func(x, gradient []float64) float64 {
+		return myconstraint(x, gradient, -1., 1.)
+	}, 1e-8)
 	opt.SetXtolRel(0.)
 	opt.SetStopVal(math.Sqrt(8./27.) + 1e-3)
 
