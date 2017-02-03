@@ -8,8 +8,6 @@ using cgo to a c-based implementation.
 
 ## Status
 
-*Beta*
-
 [![Build Status](https://travis-ci.org/go-nlopt/nlopt.svg?branch=master)](https://travis-ci.org/go-nlopt/nlopt) [![Coverage Status](https://coveralls.io/repos/github/go-nlopt/nlopt/badge.svg?branch=master)](https://coveralls.io/github/go-nlopt/nlopt?branch=master) [![GoDoc](https://godoc.org/github.com/go-nlopt/nlopt?status.svg)](https://godoc.org/github.com/go-nlopt/nlopt)
 
 
