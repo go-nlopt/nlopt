@@ -95,20 +95,29 @@ func TestNLopt_OptimizeNonlinearLeastSquares(t *testing.T) {
 	}
 
 	opt.SetMinObjective(myfun)
-	opt.SetXtolRel(1e-4)
+	opt.SetXtolRel(1e-8)
 
 	x := []float64{0.3, 0.4}
-	xopt, minf, err := opt.Optimize(x)
+	xopt, resnorm, err := opt.Optimize(x)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got, want := opt.LastStatus(), "XTOL_REACHED"; got != want {
 		t.Errorf("Expected last status='%s', got='%s'", want, got)
 	}
-	if got, want := count, 52; got != want {
+	if got, want := count, 68; got != want {
 		t.Errorf("Expected evaluations count='%d', got='%d'", want, got)
 	}
-	fmt.Printf("BOBYQA: found minimum at f(%g,%g) = %0.10g\n", xopt[0], xopt[1], minf)
+	if got, want := xopt[0], 0.2578; !floatEquals(got, want) {
+		t.Errorf("Expected value='%f', got='%f'", want, got)
+	}
+	if got, want := xopt[1], 0.2578; !floatEquals(got, want) {
+		t.Errorf("Expected value='%f', got='%f'", want, got)
+	}
+	if got, want := resnorm, 124.3622; !floatEquals(got, want) {
+		t.Errorf("Expected resnorm value='%f', got='%f'", want, got)
+	}
+	fmt.Printf("BOBYQA: found minimum at f(%g,%g) = %0.10g\n", xopt[0], xopt[1], resnorm)
 }
 
 func TestNLopt_OptimizeMMA(t *testing.T) {
@@ -158,6 +167,15 @@ func TestNLopt_OptimizeMMA(t *testing.T) {
 	if got, want := count, 11; got != want {
 		t.Errorf("Expected evaluations count='%d', got='%d'", want, got)
 	}
+	if got, want := xopt[0], 0.333334; !floatEquals(got, want) {
+		t.Errorf("Expected value='%f', got='%f'", want, got)
+	}
+	if got, want := xopt[1], 0.296296; !floatEquals(got, want) {
+		t.Errorf("Expected value='%f', got='%f'", want, got)
+	}
+	if got, want := minf, 0.544330847; !floatEquals(got, want) {
+		t.Errorf("Expected min value='%f', got='%f'", want, got)
+	}
 	fmt.Printf("MMA: found minimum at f(%g,%g) = %0.10g\n", xopt[0], xopt[1], minf)
 }
 
@@ -194,7 +212,6 @@ func TestNLopt_OptimizeCOBYLA(t *testing.T) {
 	opt.AddInequalityConstraint(func(x, gradient []float64) float64 {
 		return myconstraint(x, gradient, -1., 1.)
 	}, 1e-8)
-	opt.SetXtolRel(0.)
 	opt.SetStopVal(math.Sqrt(8./27.) + 1e-3)
 
 	x := []float64{1.234, 5.678}
@@ -207,6 +224,15 @@ func TestNLopt_OptimizeCOBYLA(t *testing.T) {
 	}
 	if got, want := count, 25; got != want {
 		t.Errorf("Expected evaluations count='%d', got='%d'", want, got)
+	}
+	if got, want := xopt[0], 0.3330; !floatEquals(got, want) {
+		t.Errorf("Expected value='%f', got='%f'", want, got)
+	}
+	if got, want := xopt[1], 0.2962; !floatEquals(got, want) {
+		t.Errorf("Expected value='%f', got='%f'", want, got)
+	}
+	if got, want := minf, 0.544242301; !floatEquals(got, want) {
+		t.Errorf("Expected min value='%f', got='%f'", want, got)
 	}
 	fmt.Printf("COBYLA: found minimum at f(%g,%g) = %0.10g\n", xopt[0], xopt[1], minf)
 }
@@ -839,4 +865,16 @@ func TestNLopt_SetInitialStep1(t *testing.T) {
 	if got, want := dx[1], is; got != want {
 		t.Errorf("Expected dx='%f', got='%f'", want, got)
 	}
+}
+
+const epsilon float64 = 0.0001
+
+func floatEquals(a, b float64) bool {
+	if math.IsNaN(a) && math.IsNaN(b) {
+		return true
+	}
+	if (b - a) < epsilon {
+		return true
+	}
+	return false
 }

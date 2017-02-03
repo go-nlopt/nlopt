@@ -45,9 +45,9 @@ go get -u github.com/go-nlopt/nlopt
 ~~~
 
 
-## Example
+## Examples
 
-Adaptation of nonlinearly constrained problem from [NLopt Tutorial](http://ab-initio.mit.edu/wiki/index.php/NLopt_Tutorial)
+Implementation of nonlinearly constrained problem from [NLopt Tutorial](http://ab-initio.mit.edu/wiki/index.php/NLopt_Tutorial)
 
 ~~~go
 package main
@@ -96,6 +96,52 @@ func main() {
                 panic(err)
         }
         fmt.Printf("found minimum after %d evaluations at f(%g,%g) = %0.10g\n", evals, xopt[0], xopt[1], minf)
+}
+~~~
+
+Implementation of [Nonlinear Least Squares Without Jacobian](https://uk.mathworks.com/help/optim/ug/nonlinear-least-squares-with-full-jacobian.html)
+
+~~~go
+package main
+
+import (
+        "fmt"
+        "github.com/go-nlopt/nlopt"
+        "math"
+)
+
+func main() {
+        opt, err := nlopt.NewNLopt(nlopt.LN_BOBYQA, 2)
+        if err != nil {
+                panic(err)
+        }
+        defer opt.Destroy()
+
+        k := []float64{1., 2., 3., 4., 5., 6., 7., 8., 9., 10.}
+        
+        var evals int
+        myfun := func(x, gradient []float64) float64 {
+                evals++
+                f := make([]float64, len(k))
+                for i := 0; i < len(k); i++ {
+                        f[i] = 2 + 2*k[i] - math.Exp(k[i]*x[0]) - math.Exp(k[i]*x[1])
+                }
+                var chi2 float64
+                for i := 0; i < len(f); i++ {
+                        chi2 += (f[i] * f[i])
+                }
+                return chi2
+        }
+                  
+        opt.SetMinObjective(myfun)
+        opt.SetXtolRel(1e-8)
+
+        x := []float64{0.3, 0.4}
+        xopt, resnorm, err := opt.Optimize(x)
+        if err != nil {
+                panic(err)
+        }
+        fmt.Printf("BOBYQA: found minimum after %d evaluations at f(%g,%g) = %0.10g\n", evals, xopt[0], xopt[1], resnorm)
 }
 ~~~
 
