@@ -35,11 +35,31 @@ curl -O http://ab-initio.mit.edu/nlopt/nlopt-2.4.2.tar.gz && tar xzvf nlopt-2.4.
 
 - On Windows download binary packages at [NLopt on Windows](http://ab-initio.mit.edu/wiki/index.php/NLopt_on_Windows)
 
-Then install `nlopt` package
+If you use pre-packaged binaries, you might want to either make symlink or a copy of `libnlopt-0.dll` library
+file as `libnlopt.dll`, e.g.:
+
+~~~
+mklink libnlopt.dll libnlopt-0.dll
+~~~
+
+If the C++ library is in a non-standard directory or you are using Windows, 
+make sure to export `LIBRARY_PATH` environment variable, e.g.:
+
+~~~
+export LIBRARY_PATH=/path/to/NLopt
+~~~
+
+or, on Windows:
+
+~~~
+set LIBRARY_PATH=C:\path\to\NLopt
+~~~
+
+
+Then install `nlopt` package. 
 
 ~~~
 go get -u github.com/go-nlopt/nlopt
-[CGO_LDFLAGS="-L/path/to/NLopt -lnlopt"] go install github.com/go-nlopt/nlopt
 ~~~
 
 
