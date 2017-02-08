@@ -96,16 +96,17 @@ func TestNLopt_OptimizeNonlinearLeastSquares(t *testing.T) {
 
 	opt.SetMinObjective(myfun)
 	opt.SetXtolRel(1e-8)
+	opt.SetFtolRel(1e-8)
 
 	x := []float64{0.3, 0.4}
 	xopt, resnorm, err := opt.Optimize(x)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := opt.LastStatus(), "XTOL_REACHED"; got != want {
+	if got, want := opt.LastStatus(), "FTOL_REACHED"; got != want {
 		t.Errorf("Expected last status='%s', got='%s'", want, got)
 	}
-	if got, want := count, 68; got != want {
+	if got, want := count, 56; got != want {
 		t.Errorf("Expected evaluations count='%d', got='%d'", want, got)
 	}
 	if got, want := xopt[0], 0.2578; !floatEquals(got, want) {

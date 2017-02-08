@@ -153,6 +153,7 @@ func main() {
                   
         opt.SetMinObjective(myfun)
         opt.SetXtolRel(1e-8)
+        opt.SetFtolRel(1e-8)
 
         x := []float64{0.3, 0.4}
         xopt, resnorm, err := opt.Optimize(x)
