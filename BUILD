@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_prefix", "go_library", "go_test", "cgo_library")
+load("@io_bazel_rules_go//go:def.bzl", "cgo_library", "go_library", "go_prefix", "go_test")
 
 go_prefix("github.com/go-nlopt/nlopt")
 
@@ -9,11 +9,13 @@ cgo_library(
         "nlopt.h",
         "nlopt_cfunc.go",
     ],
-    clinkopts = [
-        "-lnlopt",
-        "-lm",
+    clinkopts = ["-lnlopt"],
+    copts = [
+        "-Os",
+        "-fno-common",
+        "-mtune=native",
+        "-march=native",
     ],
-    copts = ["-Os"],
     visibility = ["//visibility:private"],
 )
 

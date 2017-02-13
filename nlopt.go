@@ -1,8 +1,8 @@
 package nlopt
 
 /*
-#cgo CFLAGS: -Os
-#cgo LDFLAGS: -lnlopt -lm
+#cgo CFLAGS: -Os -fno-common -mtune=native -march=native
+#cgo LDFLAGS: -lnlopt
 #include "nlopt.h"
 #include <stdlib.h>
 
