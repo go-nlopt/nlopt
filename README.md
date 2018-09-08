@@ -29,8 +29,8 @@ apt-get install -y libnlopt-dev
   C compiler, using the standard procedure:
 
 ~~~
-curl -O http://ab-initio.mit.edu/nlopt/nlopt-2.4.2.tar.gz && tar xzvf nlopt-2.4.2.tar.gz && cd nlopt-2.4.2
-./configure --enable-shared && make && sudo make install
+curl -O https://codeload.github.com/stevengj/nlopt/tar.gz/v2.5.0 && tar xzvf v2.5.0 && cd nlopt-2.5.0
+cmake . && make && sudo make install
 ~~~
 
 - On Windows download binary packages at [NLopt on Windows](http://ab-initio.mit.edu/wiki/index.php/NLopt_on_Windows)
