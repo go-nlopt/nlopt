@@ -868,6 +868,64 @@ func TestNLopt_SetInitialStep1(t *testing.T) {
 	}
 }
 
+func TestNLopt_GenericAlgorithms(t *testing.T) {
+
+	// test setting parameters for the MMA or CCSA algorithms
+	// works on NLopt library version 2.7.0+
+
+	opt, err := NewNLopt(LD_MMA, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer opt.Destroy()
+
+	v := numericVersion(Version())
+	if v < 270 {
+		fmt.Println("NLopt library version", v, "without generic algorithm parameters functionality")
+		return
+	}
+
+	numParams := opt.NumParams()
+	if numParams != 0 {
+		t.Errorf("Expected number of parameters='%d', got='%d'", 0, numParams)
+	}
+	hasInnerMaxEval := opt.HasParam("inner_maxeval")
+	if hasInnerMaxEval != 0 {
+		t.Errorf("Expected inner_maxeval='%d', got='%d'", 0, hasInnerMaxEval)
+	}
+	err = opt.SetParam("inner_maxeval", 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hasInnerMaxEval = opt.HasParam("inner_maxeval")
+	if hasInnerMaxEval != 1 {
+		t.Errorf("Expected inner_maxeval='%d', got='%d'", 1, hasInnerMaxEval)
+	}
+	err = opt.SetParam("dual_ftol_rel", 1e-8)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	numParams = opt.NumParams()
+	if numParams != 2 {
+		t.Errorf("Expected number of parameters='%d', got='%d'", 0, numParams)
+	}
+	nthParam := opt.NthParam(1)
+	if nthParam != "dual_ftol_rel" {
+		t.Errorf("Expected number of parameters='%s', got='%s'", "dual_ftol_rel", nthParam)
+	}
+
+	innerMaxEval := opt.GetParam("inner_maxeval", 0)
+	if !floatEquals(innerMaxEval, 10) {
+		t.Errorf("Expected inner_maxeval='%d', got='%f'", 10, innerMaxEval)
+	}
+	dualFTolRel := opt.GetParam("dual_ftol_rel", 0)
+	if !floatEquals(dualFTolRel, 1e-8) {
+		t.Errorf("Expected dual_ftol_rel='%f', got='%f'", 1e-8, dualFTolRel)
+	}
+
+}
+
 const epsilon float64 = 0.0001
 
 func floatEquals(a, b float64) bool {
@@ -878,4 +936,10 @@ func floatEquals(a, b float64) bool {
 		return true
 	}
 	return false
+}
+
+func numericVersion(s string) int {
+	var major, minor, patch int
+	fmt.Sscanf(s, "%d.%d.%d", &major, &minor, &patch)
+	return major*100 + minor*10 + patch
 }

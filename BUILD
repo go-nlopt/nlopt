@@ -1,33 +1,26 @@
-load("@io_bazel_rules_go//go:def.bzl", "cgo_library", "go_library", "go_prefix", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@bazel_gazelle//:def.bzl", "gazelle")
 
-go_prefix("github.com/go-nlopt/nlopt")
+# gazelle:prefix github.com/go-nlopt/nlopt
+gazelle(name = "gazelle")
 
-cgo_library(
-    name = "cgo_default_library",
+go_library(
+    name = "nlopt",
     srcs = [
+        "cfunc_reg.go",
         "nlopt.go",
         "nlopt.h",
         "nlopt_cfunc.go",
     ],
+    cgo = True,
     clinkopts = ["-lnlopt"],
-    copts = [
-        "-Os",
-        "-fno-common",
-        "-mtune=native",
-        "-march=native",
-    ],
-    visibility = ["//visibility:private"],
-)
-
-go_library(
-    name = "go_default_library",
-    srcs = ["cfunc_reg.go"],
-    library = ":cgo_default_library",
+    copts = ["-Os", "-fno-common", "-mtune=native", "-march=native"],
+    importpath = "github.com/go-nlopt/nlopt",
     visibility = ["//visibility:public"],
 )
 
 go_test(
-    name = "go_default_test",
+    name = "nlopt_test",
     srcs = ["nlopt_test.go"],
-    library = ":go_default_library",
+    embed = [":nlopt"],
 )

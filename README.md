@@ -15,21 +15,21 @@ using cgo to a c-based implementation.
 
 - On RedHat/CentOS/Fedora
 
-~~~
+~~~shell script
 yum/dnf -y install nlopt-devel
 ~~~
 
 - On Ubuntu (14.04+)
 
-~~~
+~~~shell script
 apt-get install -y libnlopt-dev
 ~~~
 
 - or, install NLopt library on any Unix-like system (GNU/Linux is fine) with a 
   C compiler, using the standard procedure:
 
-~~~
-curl -O https://codeload.github.com/stevengj/nlopt/tar.gz/v2.5.0 && tar xzvf v2.5.0 && cd nlopt-2.5.0
+~~~shell script
+curl -O https://codeload.github.com/stevengj/nlopt/tar.gz/v2.7.0 && tar xzvf v2.7.0 && cd nlopt-2.7.0
 cmake . && make && sudo make install
 ~~~
 
@@ -38,27 +38,27 @@ cmake . && make && sudo make install
 If you use pre-packaged binaries, you might want to either make symlink or a copy of `libnlopt-0.dll` library
 file as `libnlopt.dll`, e.g.:
 
-~~~
+~~~shell script
 mklink libnlopt.dll libnlopt-0.dll
 ~~~
 
-If the C++ library is in a non-standard directory or you are using Windows, 
+If the C++ library is in a non-standard directory, or you are using Windows, 
 make sure to export `LIBRARY_PATH` environment variable, e.g.:
 
-~~~
+~~~shell script
 export LIBRARY_PATH=/path/to/NLopt
 ~~~
 
 or, on Windows:
 
-~~~
+~~~shell script
 set LIBRARY_PATH=C:\path\to\NLopt
 ~~~
 
 
 Then install `nlopt` package. 
 
-~~~
+~~~shell script
 go get -u github.com/go-nlopt/nlopt
 ~~~
 

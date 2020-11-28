@@ -40,7 +40,7 @@ func nloptMfunc(m uint, result *C.double, n uint, x *C.double, gradient *C.doubl
 	var goResult []float64
 	var cResult []C.double
 	if result != nil {
-		cResult = (*[1 << 30]C.double)(unsafe.Pointer(result))[:m*n : m*n]
+		cResult = (*[1 << 30]C.double)(unsafe.Pointer(result))[: m*n : m*n]
 		goResult = toGoArray(cResult)
 	}
 

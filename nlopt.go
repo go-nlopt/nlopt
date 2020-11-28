@@ -369,6 +369,40 @@ func (n *NLopt) LastStatus() string {
 	return n.lastStatus
 }
 
+// generic algorithm parameters:
+
+// SetParam sets an internal algorithm parameter
+func (n *NLopt) SetParam(name string, val float64) error {
+	var cResult C.nlopt_result = C.nlopt_set_param(n.cOpt, C.CString(name), (C.double)(val))
+	status, err := normResult(cResult)
+	n.setStatus(status)
+	return err
+}
+
+// GetParam gets an internal algorithm parameter by name
+func (n *NLopt) GetParam(name string, defaultVal float64) float64 {
+	var cResult C.double = C.nlopt_get_param(n.cOpt, C.CString(name), (C.double)(defaultVal))
+	return float64(cResult)
+}
+
+// HasParam checks whether an internal algorithm parameter has been set
+func (n *NLopt) HasParam(name string) int {
+	var cResult C.int = C.nlopt_has_param(n.cOpt, C.CString(name))
+	return int(cResult)
+}
+
+// HasParam returns number of internal algorithm parameters
+func (n *NLopt) NumParams() uint {
+	var cResult C.uint = C.nlopt_num_params(n.cOpt)
+	return uint(cResult)
+}
+
+// NthParam gets an internal algorithm parameter for provided index
+func (n *NLopt) NthParam(idx uint) string {
+	var cResult = C.nlopt_nth_param(n.cOpt, (C.uint)(idx))
+	return C.GoString(cResult)
+}
+
 // constraints:
 
 // SetLowerBounds sets lower bounds that an objective function and any
