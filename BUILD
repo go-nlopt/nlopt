@@ -13,7 +13,7 @@ go_library(
         "nlopt_cfunc.go",
     ],
     cgo = True,
-    clinkopts = ["-lnlopt"],
+    clinkopts = ["-lnlopt", "-lm"],
     copts = ["-Os", "-fno-common", "-mtune=native", "-march=native"],
     importpath = "github.com/go-nlopt/nlopt",
     visibility = ["//visibility:public"],

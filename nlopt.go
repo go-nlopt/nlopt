@@ -2,7 +2,7 @@ package nlopt
 
 /*
 #cgo CFLAGS: -Os
-#cgo LDFLAGS: -lnlopt
+#cgo LDFLAGS: -lnlopt -lm
 #include "nlopt.h"
 #include <stdlib.h>
 
