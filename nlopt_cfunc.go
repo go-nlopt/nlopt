@@ -13,7 +13,7 @@ func nloptFunc(n uint, x *C.double, gradient *C.double, fData unsafe.Pointer) C.
 	var goGrad []float64
 	var cGrad []C.double
 	if gradient != nil {
-		cGrad = (*[((math.MaxInt32 - 1)/unsafe.Sizeof(x)]C.double)(unsafe.Pointer(gradient))[:n:n]
+		cGrad = (*[((math.MaxInt32 - 1)/unsafe.Sizeof(x))]C.double)(unsafe.Pointer(gradient))[:n:n]
 		goGrad = toGoArray(cGrad)
 	}
 	v := (C.double)(f(goX, goGrad))
@@ -28,20 +28,20 @@ func nloptFunc(n uint, x *C.double, gradient *C.double, fData unsafe.Pointer) C.
 //export nloptMfunc
 func nloptMfunc(m uint, result *C.double, n uint, x *C.double, gradient *C.double, fData unsafe.Pointer) {
 	f := getMfunc(uintptr(fData))
-	cX := (*[((math.MaxInt32 - 1)/unsafe.Sizeof(x)]C.double)(unsafe.Pointer(x))[:n:n]
+	cX := (*[((math.MaxInt32 - 1)/unsafe.Sizeof(x))]C.double)(unsafe.Pointer(x))[:n:n]
 	goX := toGoArray(cX)
 
 	var goGrad []float64
 	var cGrad []C.double
 	if gradient != nil {
-		cGrad = (*[((math.MaxInt32 - 1)/unsafe.Sizeof(x)]C.double)(unsafe.Pointer(gradient))[:n:n]
+		cGrad = (*[((math.MaxInt32 - 1)/unsafe.Sizeof(x))]C.double)(unsafe.Pointer(gradient))[:n:n]
 		goGrad = toGoArray(cGrad)
 	}
 
 	var goResult []float64
 	var cResult []C.double
 	if result != nil {
-		cResult = (*[((math.MaxInt32 - 1)/unsafe.Sizeof(x)]C.double)(unsafe.Pointer(result))[: m*n : m*n]
+		cResult = (*[((math.MaxInt32 - 1)/unsafe.Sizeof(x))]C.double)(unsafe.Pointer(result))[: m*n : m*n]
 		goResult = toGoArray(cResult)
 	}
 
