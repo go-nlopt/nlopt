@@ -1,3 +1,3 @@
-module github.com/biotinker/nlopt
+module github.com/go-nlopt/nlopt
 
 go 1.15
