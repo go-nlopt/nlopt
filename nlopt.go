@@ -233,7 +233,7 @@ type NLopt struct {
 	dim  uint
 
 	mutex      sync.Mutex
-	funcs      []uintptr
+	funcs      []*uint8
 	lastStatus string
 }
 
@@ -256,7 +256,7 @@ func NewNLopt(algorithm int, n uint) (*NLopt, error) {
 	}, nil
 }
 
-func (n *NLopt) addFunc(f Func) uintptr {
+func (n *NLopt) addFunc(f Func) *uint8 {
 	n.mutex.Lock()
 	defer n.mutex.Unlock()
 
@@ -265,7 +265,7 @@ func (n *NLopt) addFunc(f Func) uintptr {
 	return ptr
 }
 
-func (n *NLopt) addMfunc(f Mfunc) uintptr {
+func (n *NLopt) addMfunc(f Mfunc) *uint8 {
 	n.mutex.Lock()
 	defer n.mutex.Unlock()
 
@@ -297,7 +297,7 @@ func (n *NLopt) Destroy() {
 	for _, ptr := range n.funcs {
 		freeFuncPtr(ptr)
 	}
-	n.funcs = []uintptr{}
+	n.funcs = []*uint8{}
 }
 
 // Copy makes an independent copy of an object
