@@ -2,7 +2,9 @@ package nlopt
 
 /*
 #cgo CFLAGS: -Os
-#cgo LDFLAGS: -lnlopt -lm
+#cgo windows LDFLAGS: -lnlopt -lm
+#cgo !windows LDFLAGS: -lm
+#cgo !windows pkg-config: nlopt
 #include "nlopt.h"
 #include <stdlib.h>
 
